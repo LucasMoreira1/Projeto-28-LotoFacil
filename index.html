@@ -96,157 +96,153 @@
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
     <script>
-      $(document).ready(function() {
-        // Function to create checkboxes based on the template
-        const checkboxesContainer = $('.checkboxes');
-        const startNumber = 1;
-        const endNumber = 25;
+  $(document).ready(function() {
+    //#region // Create checkboxes
+    
+    const checkboxesContainer = $('.checkboxes');
+    const startNumber = 1;
+    const endNumber = 25;
+    // Hide the template checkbox
+    checkboxesContainer.find('.template').hide();
+    
 
-        // Hide the template checkbox
-        checkboxesContainer.find('.template').hide();
+    for (let i = startNumber; i <= endNumber; i++) {
+      const checkboxLabel = $('<label class="w-checkbox"></label>');
+      const checkboxInput = $('<input type="checkbox" class="w-checkbox-input">').val(i);
+      const checkboxSpan = $('<span class="checkbox-label w-form-label"></span>').text(i);
 
-        for (let i = startNumber; i <= endNumber; i++) {
-          const checkboxLabel = $('<label class="w-checkbox"></label>');
-          const checkboxInput = $('<input type="checkbox" class="w-checkbox-input">').val(i);
-          const checkboxSpan = $('<span class="checkbox-label.w-form-label"></span>').text(i);
+      checkboxLabel.append(checkboxInput);
+      checkboxLabel.append(checkboxSpan);
 
-          checkboxLabel.append(checkboxInput);
-          checkboxLabel.append(checkboxSpan);
+      checkboxesContainer.append(checkboxLabel);
+    }
 
-          checkboxesContainer.append(checkboxLabel);
+    //#endregion 
+
+    // Define elements and variables
+    const $resultadoDiv = $('.resultado');
+    const $numerosDiv = $('.numeros');
+    const selectedNumbers = [];
+
+    // Function to update result text
+    // function updateResult() {
+    //   let resultText = "Números selecionados: ";
+
+    //   if (selectedNumbers.length > 0) {
+    //     resultText += selectedNumbers.join(', ');
+    //   } else {
+    //     resultText += "none";
+    //   }
+
+    //   const $resultElement = $('<div>').text(resultText);
+    //   $resultadoDiv.append($resultElement);
+    // }
+
+    // Event handler for checkbox click
+    $('.w-checkbox-input').click(function() {
+      const number = $(this).val();
+
+      if ($(this).is(':checked')) {
+        if (!selectedNumbers.includes(number)) {
+          selectedNumbers.push(number);
         }
-
-        // Function to get the value from checkboxes checked and show it results to '.numeros'
-        const $totalNumeros = $('.numeros');
-        const selectedNumbers = [];
-
-        $('.w-checkbox-input').click(function() {
-          const number = $(this).val();
-
-          if ($(this).is(':checked')) {
-            if (!selectedNumbers.includes(number)) {
-              selectedNumbers.push(number);
-            }
-          } else {
-            const index = selectedNumbers.indexOf(number);
-            if (index > -1) {
-              selectedNumbers.splice(index, 1);
-            }
-          }
-
-          selectedNumbers.sort((a, b) => {
-            return parseInt(a) - parseInt(b);
-          });
-
-          const resultText = "Números selecionados: " + selectedNumbers.join(', ');
-          $totalNumeros.text(resultText);
-          console.log(resultText);
-        });
-
-        // Event handler for submit button click
-        $('.submit-button').click(function() {
-          const initialSelectedCount = 10;
-          const additionalRandomCount = 5;
-
-          // Get the initially selected numbers
-          const initiallySelectedNumbers = selectedNumbers.slice(0, initialSelectedCount);
-
-          if (initiallySelectedNumbers.length !== initialSelectedCount) {
-            alert('Favor selecionar 10 números');
-            return;
-          }
-
-          if (initiallySelectedNumbers.length > initialSelectedCount) {
-            alert('Você selecionou mais de 10 números');
-            return;
-          }
-
-          // Generate and select additional random numbers
-          const remainingNumbers = $('.w-checkbox-input:not(:checked)').map(function() {
-            return $(this).val();
-          }).get();
-
-          const additionalRandomNumbers = getRandomNumbers(remainingNumbers, additionalRandomCount);
-
-          // Combine the initially selected and additional random numbers
-          const finalSelectedNumbers = initiallySelectedNumbers.concat(additionalRandomNumbers);
-
-          
-
-          // Mark the final selected numbers as checked
-          $('.w-checkbox-input').prop('checked', false);
-          finalSelectedNumbers.forEach(number => {
-            $('.w-checkbox-input[value="' + number + '"]').prop('checked', true);
-          });
-
-          // Sort the final selected numbers
-          finalSelectedNumbers.sort((a, b) => {
-            return parseInt(a) - parseInt(b);
-          });
-
-          // Update the result text
-          const resultText = "Números selecionados: " + finalSelectedNumbers.join(', ');
-          $totalNumeros.text(resultText);
-          console.log(resultText);
-        });
-
-
-        // Function to select random numbers from the remaining unchecked numbers
-        function getRandomNumbers(numbersArray, count) {
-          const randomNumbers = [];
-          const availableNumbers = numbersArray.slice();
-
-          for (let i = 0; i < count; i++) {
-            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
-            randomNumbers.push(availableNumbers.splice(randomIndex, 1)[0]);
-          }
-
-          return randomNumbers;
+      } else {
+        const index = selectedNumbers.indexOf(number);
+        if (index > -1) {
+          selectedNumbers.splice(index, 1);
         }
+      }
 
+      selectedNumbers.sort((a, b) => {
+        return parseInt(a) - parseInt(b);
       });
 
+      const resultText = "Números selecionados: " + selectedNumbers.join(', ');
+      $numerosDiv.text(resultText);
+    });
 
-    </script>
+    // Event handler for submit button click
+    $('.submit-button').click(function(event) {
+      event.preventDefault(); // Prevent page refresh
+      const initialSelectedCount = 10;
+      const additionalRandomCount = 5;
 
+      // Get the initially selected numbers
+      const initiallySelectedNumbers = selectedNumbers.slice(0, initialSelectedCount);
 
-    <!-- <script data-info="hacks-body">
-      $(document).ready(function() {
-        const $totalNumeros = $('.numeros');
-        const selectedNumbers = [];
-    
-        $('.checkbox-label.w-form-label').click(function() {
-          const $checkbox = $(this).prev();
-          const number = $checkbox.val();
-          let resultText = "You selected numbers ";
-    
-          if ($checkbox.is(':checked')) {
-            resultText += selectedNumbers.join(', ');
-            if (!selectedNumbers.includes(number)) {
-              selectedNumbers.push(number);
-            }
-          } else {
-            const index = selectedNumbers.indexOf(number);
-            if (index > -1) {
-              selectedNumbers.splice(index, 1);
-            }
-          }
-    
-          if (selectedNumbers.length > 0) {
-            resultText += selectedNumbers.join(', ');
-          } else {
-            resultText += "none";
-          }
-    
-          $totalNumeros.text(resultText);
-          console.log(resultText);
-        });
+      if (initiallySelectedNumbers.length !== initialSelectedCount) {
+        alert('Favor selecionar 10 números');
+        return;
+      }
+
+      if (initiallySelectedNumbers.length > initialSelectedCount) {
+        alert('Você selecionou mais de 10 números');
+        return;
+      }
+
+      // Generate and select additional random numbers
+      const remainingNumbers = $('.w-checkbox-input:not(:checked)').map(function() {
+        return $(this).val();
+      }).get();
+
+      const additionalRandomNumbers = getRandomNumbers(remainingNumbers, additionalRandomCount);
+
+      // Combine the initially selected and additional random numbers
+      const finalSelectedNumbers = initiallySelectedNumbers.concat(additionalRandomNumbers);
+
+      // Mark the final selected numbers as checked
+      $('.w-checkbox-input').prop('checked', false);
+      finalSelectedNumbers.forEach(number => {
+        $('.w-checkbox-input[value="' + number + '"]').prop('checked', true);
       });
-    </script> -->
-      
-      
-      
+
+      // Sort the final selected numbers
+      finalSelectedNumbers.sort((a, b) => {
+        return parseInt(a) - parseInt(b);
+      });
+
+      // Update the result text
+      const resultText = "Números selecionados: " + finalSelectedNumbers.join(', ');
+      $numerosDiv.text(resultText);
+      console.log(resultText);
+
+      // Show10 different results
+      for (let i = 0; i < 10; i++) {
+        simulateButtonClick(finalSelectedNumbers);
+      }
+    });
+
+    // Function to select random numbers from the remaining unchecked numbers
+    function getRandomNumbers(numbersArray, count) {
+      const randomNumbers = [];
+      const availableNumbers = numbersArray.slice();
+
+      for (let i = 0; i < count; i++) {
+        const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+        randomNumbers.push(availableNumbers.splice(randomIndex, 1)[0]);
+      }
+
+      return randomNumbers;
+    }
+
+    // Function to simulate button click and display result
+    // function simulateButtonClick(selectedNumbers) {
+    //   let resultText = "Números selecionados: ";
+
+    //   if (selectedNumbers.length > 0) {
+    //     resultText += selectedNumbers.join(', ');
+    //   } else {
+    //     resultText += "none";
+    //   }
+
+    //   const $resultElement = $('<div>').text(resultText);
+    //   $resultadoDiv.append($resultElement);
+    // }
+  });
+</script>
 
     <script
       src="./script.js"
